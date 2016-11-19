@@ -22,18 +22,26 @@ def parseOptions():
     parser.add_option("--select-regions", dest="SELECT_REGIONS",
                       action="store_true", default=False, 
                       help="Select abnormal code regions.")
+
+    parser.add_option("--select-classname", dest="SELECT_CLASSNAME",
+                      action="store_true", default=False,
+                      help="Select function in buggy class")
     
     parser.add_option("-m", "--metric", dest="METRIC", 
                       help="Name for the abnormal metric.")
     
     parser.add_option("-a", "--abnormal-traces", dest="AFILE", 
                       help="Abnormal traces file.")
+
     parser.add_option("-n", "--normal-traces", dest="NFILE", 
                       help="Normal traces file.")
     
     parser.add_option("-w", "--many-windows", dest="MANY_WINDOWS",
                       action="store_true", default=False, 
                       help="Use a large number of windows in the analysis.\nUseful when data sets are small.")
+
+    parser.add_option("-c", "--className", dest="CLASSNAME",
+                      help="Classname with bug")
     
     (options, args) = parser.parse_args()
     #if len(options) == 0:
@@ -41,6 +49,12 @@ def parseOptions():
     #    exit()
         
     return (options, args)
+
+def getClassName(options):
+    if options.CLASSNAME is None:
+        HandleError.exit('No classname given.\nUse -h option for help.')
+    else:
+        return options.CLASSNAME
 
 def getAbnormalFile(options):
     if options.AFILE is None:
@@ -83,23 +97,27 @@ def getMetric(options):
             
     return metric_id
     
-# Returns two operation-mode types: SELECT_METRICS and SELECT_REGIONS
+# Returns three operation-mode types: SELECT_METRICS, SELECT_REGIONS AND SELECT_CLASS
 def getMode(options):
     select_metrics = options.SELECT_METRICS
     select_regions = options.SELECT_REGIONS
+    select_classname = options.SELECT_CLASSNAME
     
     # Can only specify one operational mode
-    if select_metrics is True and select_regions is True:
-        HandleError.exit('Cannot use these options together:\n --select-metrics & --select-regions. \nUse -h option for help.')
+    if (select_metrics is True and select_regions is True) or (select_metrics is True and select_classname is True) or (select_classname is True and select_regions is True):
+        HandleError.exit('Cannot use these options together:\n --select-metrics & --select-regions & --select-classname. \nUse -h option for help.')
         
-    if select_metrics is False and select_regions is False:
-        HandleError.exit('Please use one of these options:\n--select-metrics OR --select-regions. \nUse -h option for help.')
+    if select_metrics is False and select_regions is False and select_classname is False:
+        HandleError.exit('Please use one of these options:\n--select-metrics OR --select-regions OR --select-classname. \nUse -h option for help.')
         
     if select_metrics is True:
         mode = 'SELECT_METRICS'
     elif select_regions is True:
         mode = 'SELECT_REGIONS'
-        
+    elif select_classname is True:
+        mode = 'SELECT_CLASSNAME'
+
+
     return mode
     
 #############################################################################
@@ -121,4 +139,8 @@ if mode == 'SELECT_METRICS':
 elif mode == 'SELECT_REGIONS':
     metric = getMetric(options)
     localizationAnalysis(normalFile, abnormalFile, metric, manyWins)
-
+elif mode == 'SELECT_CLASSNAME':
+    print "Here"
+    metric = getMetric(options)
+    className = getClassName(options)
+    localizationAnalysis(normalFile, abnormalFile, metric, manyWins, className)

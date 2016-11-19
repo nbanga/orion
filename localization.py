@@ -135,6 +135,14 @@ class StringColumn(Column):
             if e not in ret:
                 ret.add(e)
         return ret
+
+    def getClassObservations(self,className):
+        trace = []
+        for e in self.l:
+            if className in e:
+                tmp = e.split('-')[1].split(className)[1]
+                trace.append(tmp)
+        return trace
     
     # Returns one observation before and one after a given observation
     def getPreviousAndBeforeObservations(self, middleObs):
@@ -458,7 +466,10 @@ class Window(object):
     def getPreviousAndBeforeObservations(self, middleObs):
         seqs = self.colA.getPreviousAndBeforeObservations(middleObs)
         return seqs
-        
+
+    def getClassObservations(self,className):
+        return self.colA.getClassObservations(className)
+
 ##############################################################################
 # Helper functions
 ##############################################################################
@@ -689,7 +700,6 @@ def findAnomalousPoints(windowsList, method):
         for o in obsSet:
             # Parse observation
             if method == 'CLASSNAME_ONLY':
-                
                 # Only split by '-' in Java applications.
                 # ENTER-org/apache/hadoop/dfs/TestCrcCorruption$testCrcCorruption,
                 if '-' in o:
@@ -699,7 +709,7 @@ def findAnomalousPoints(windowsList, method):
                 else:
                     name = o
                     subName = o
-                      
+
                 if name not in subNameOccurr.keys():
                     tmp = {}
                     tmp[subName] = 1
@@ -709,7 +719,7 @@ def findAnomalousPoints(windowsList, method):
                         subNameOccurr[name][subName] = 1
                     else:
                         subNameOccurr[name][subName] = subNameOccurr[name][subName] + 1
-                
+
             elif method == 'CLASSNAME_AND_METHOD':
                 if '-' in o:
                     name = o.split('-')[1]
@@ -717,12 +727,12 @@ def findAnomalousPoints(windowsList, method):
                     name = o
             else:
                 HandleError.exit('in findAnomalousPoints: unknown method')
-            
+
             if name not in occurrenceNumber.keys():
                 occurrenceNumber[name] = 1
             else:
                 occurrenceNumber[name] = occurrenceNumber[name] + 1
-    
+
     l = sorted(occurrenceNumber, key=occurrenceNumber.get)
     l.reverse()
     ret = []
@@ -757,31 +767,42 @@ def printCulpritSubWindows(abnormalCodeRegions, abnormalWindows):
             for reg in seq:
                 print "\t", reg
             print ""
-            
-def localizationAnalysis(normalFile, abnormalFile, metric, manyWins):    
+
+
+def findAnomalousFunction(windowList,className):
+    all_traces = []
+    for win in windowList:
+        trace = win.getClassObservations(className)
+        all_traces.append(trace)
+    #print(all_traces)
+
+
+def localizationAnalysis(normalFile, abnormalFile, metric, manyWins, className=""):
     windows = findAnomalousWindows(normalFile, abnormalFile, metric, manyWins)
-    obs = findAnomalousPoints(windows, 'CLASSNAME_ONLY')
-    #obs = findAnomalousPoints(windows, 'CLASSNAME_AND_METHOD')
+    if className=="":
+        obs = findAnomalousPoints(windows, 'CLASSNAME_ONLY')
+        print '\n========== Top-3 Abnormal Code Regions =========='
+        print '[1]:'
+        #print '\t[' + str(obs[0][1]) + ']', obs[0][0]
+        prev_dist = obs[0][1]
+
+        level = 1
+        for o in obs:
+            if prev_dist == o[1]:
+                print '\t[' + str(o[1]) + ']', o[0]
+            else:
+                level = level + 1
+                if level > 3:
+                    break
+
+                print '[' + str(level) + ']:'
+                print '\t[' + str(o[1]) + ']', o[0]
+
+            prev_dist = o[1]
+    else:
+        obs = findAnomalousFunction(windows, className)
     
-    print '\n========== Top-3 Abnormal Code Regions =========='
-    print '[1]:'
-    #print '\t[' + str(obs[0][1]) + ']', obs[0][0]
-    prev_dist = obs[0][1]
-    
-    level = 1
-    for o in obs:
-        if prev_dist == o[1]:
-            print '\t[' + str(o[1]) + ']', o[0]
-        else:
-            level = level + 1
-            if level > 3:
-                break
-            
-            print '[' + str(level) + ']:'
-            print '\t[' + str(o[1]) + ']', o[0]
-            
-        prev_dist = o[1]
-     
+
     # For IBM case   
     #printCulpritSubWindows(obs, windows)
 
