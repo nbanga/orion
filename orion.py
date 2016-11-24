@@ -104,7 +104,7 @@ def getMode(options):
     select_classname = options.SELECT_CLASSNAME
     
     # Can only specify one operational mode
-    if (select_metrics is True and select_regions is True) or (select_metrics is True and select_classname is True) or (select_classname is True and select_regions is True):
+    if (select_metrics is True and select_regions is True) or (select_metrics is True and select_classname is True):
         HandleError.exit('Cannot use these options together:\n --select-metrics & --select-regions & --select-classname. \nUse -h option for help.')
         
     if select_metrics is False and select_regions is False and select_classname is False:
@@ -117,9 +117,8 @@ def getMode(options):
     elif select_classname is True:
         mode = 'SELECT_CLASSNAME'
 
-
     return mode
-    
+
 #############################################################################
 # Main script
 #############################################################################

@@ -140,7 +140,7 @@ class StringColumn(Column):
         trace = []
         for e in self.l:
             if className in e:
-                tmp = e.split('-')[1].split(className)[1]
+                tmp = e.split('-')[0] + '-' + e.split('-')[1].split(className)[1]
                 trace.append(tmp)
         return trace
     
@@ -774,7 +774,7 @@ def findAnomalousFunction(windowList,className):
     for win in windowList:
         trace = win.getClassObservations(className)
         all_traces.append(trace)
-    #print(all_traces)
+    print(all_traces[1])
 
 
 def localizationAnalysis(normalFile, abnormalFile, metric, manyWins, className=""):
