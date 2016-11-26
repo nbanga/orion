@@ -5,6 +5,7 @@ import math
 import operator
 import os
 import time
+from toGraph import *
 
 class Column(object):
     def __init__(self, list):
@@ -771,10 +772,15 @@ def printCulpritSubWindows(abnormalCodeRegions, abnormalWindows):
 
 def findAnomalousFunction(windowList,className):
     all_traces = []
+    allNodes = dict()
     for win in windowList:
         trace = win.getClassObservations(className)
         all_traces.append(trace)
-    print(all_traces[1])
+    pa = makeGraph(all_traces[0],allNodes)
+    for each in all_traces[1:]:
+        pruneGraph(each, allNodes)
+        print "********"
+
 
 
 def localizationAnalysis(normalFile, abnormalFile, metric, manyWins, className=""):
