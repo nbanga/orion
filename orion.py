@@ -141,5 +141,5 @@ elif mode == 'SELECT_REGIONS':
 elif mode == 'SELECT_CLASSNAME':
     print "Here"
     metric = getMetric(options)
-    className = getClassName(options)
-    localizationAnalysis(normalFile, abnormalFile, metric, manyWins, className)
+    #className = getClassName(options)
+    localizationAnalysis(normalFile, abnormalFile, metric, manyWins, True)
