@@ -136,12 +136,10 @@ class StringColumn(Column):
                 ret.add(e)
         return ret
 
-    def getClassObservations(self,className):
+    def getClassObservations(self):
         trace = []
         for e in self.l:
-            if className in e:
-                tmp = e.split('-')[0] + '-' + e.split('-')[1].split(className)[1]
-                trace.append(tmp)
+           trace.append(e)
         return trace
     
     # Returns one observation before and one after a given observation
@@ -467,8 +465,8 @@ class Window(object):
         seqs = self.colA.getPreviousAndBeforeObservations(middleObs)
         return seqs
 
-    def getClassObservations(self,className):
-        return self.colA.getClassObservations(className)
+    def getClassObservations(self):
+        return self.colA.getClassObservations()
 
 ##############################################################################
 # Helper functions
@@ -769,17 +767,20 @@ def printCulpritSubWindows(abnormalCodeRegions, abnormalWindows):
             print ""
 
 
-def findAnomalousFunction(windowList,className):
+def findAnomalousFunction(windowList):
     all_traces = []
     for win in windowList:
-        trace = win.getClassObservations(className)
+        trace = win.getClassObservations()
         all_traces.append(trace)
-    print(all_traces[1])
+    #print(all_traces[0])
+    """for each in all_traces:
+        print(each)
+        print
+    """
 
-
-def localizationAnalysis(normalFile, abnormalFile, metric, manyWins, className=""):
+def localizationAnalysis(normalFile, abnormalFile, metric, manyWins, function=False):
     windows = findAnomalousWindows(normalFile, abnormalFile, metric, manyWins)
-    if className=="":
+    if function==False:
         obs = findAnomalousPoints(windows, 'CLASSNAME_ONLY')
         print '\n========== Top-3 Abnormal Code Regions =========='
         print '[1]:'
@@ -800,7 +801,7 @@ def localizationAnalysis(normalFile, abnormalFile, metric, manyWins, className="
 
             prev_dist = o[1]
     else:
-        obs = findAnomalousFunction(windows, className)
+        obs = findAnomalousFunction(windows)
     
 
     # For IBM case   
