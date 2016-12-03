@@ -139,7 +139,9 @@ class StringColumn(Column):
     def getClassObservations(self):
         trace = []
         for e in self.l:
-           trace.append(e)
+            #if "$access$" in e:
+            #    e = e.rsplit('$',1)[0]
+            trace.append(e)
         return trace
     
     # Returns one observation before and one after a given observation
@@ -767,16 +769,79 @@ def printCulpritSubWindows(abnormalCodeRegions, abnormalWindows):
             print ""
 
 
-def findAnomalousFunction(windowList):
-    all_traces = []
-    for win in windowList:
-        trace = win.getClassObservations()
-        all_traces.append(trace)
-    #print(all_traces[0])
-    """for each in all_traces:
-        print(each)
-        print
-    """
+def findAnomalousFunction(normalFile, abnormalFile, className=""):
+    normalMatrix = DataLoader.load(normalFile)
+    normalMatrix.diff()
+    c1 = normalMatrix.getCol(0)
+
+    abnormalMatrix = DataLoader.load(abnormalFile)
+    abnormalMatrix.diff()
+    c2 = abnormalMatrix.getCol(0)
+
+    nf = dict()
+    anf = dict()
+    obsSet = dict()
+
+    stack = []
+    stack.append("dummy")
+    for each in c1.l:
+        if each.startswith('ENTER'):
+            each = each.split('-')[1]
+            if className in each:
+                # print "ENTER", each
+                # print "*************"
+                stack.append(each)
+                snapshot = '\n'.join(word for word in stack)
+                if nf.has_key(each):
+                    if nf[each].has_key(snapshot):
+                        nf[each][snapshot] += 1
+                    else:
+                        nf[each][snapshot] = 1
+                else:
+                    nf[each] = dict()
+                    nf[each][snapshot] = 1
+        elif each.startswith('EXIT'):
+            each = each.split('-')[1]
+            if stack[-1] == each:
+                # print "EXIT", each
+                # print "***************"
+                stack.pop()
+
+    stack = []
+    stack.append("dummy")
+    for each in c2.l:
+        if each.startswith('ENTER'):
+            each = each.split('-')[1]
+            if className in each:
+                stack.append(each)
+                snapshot = '\n'.join(word for word in stack)
+                if anf.has_key(each):
+                    if anf[each].has_key(snapshot):
+                        anf[each][snapshot] += 1
+                    else:
+                        anf[each][snapshot] = 1
+                else:
+                    anf[each] = dict()
+                    anf[each][snapshot] = 1
+        else:
+            each = each.split('-')[1]
+            if stack[-1] == each:
+                stack.pop()
+
+
+
+    #temp = sorted(nf.items(), key = operator.itemgetter(1), reverse=True)
+    for each in anf:
+        print each
+        print "===================="
+        for every in anf[each]:
+            print every, anf[each][every]
+            print "####################"
+
+    # temp = sorted(anf.items(), key = operator.itemgetter(1), reverse=True)
+    # for each in temp:
+    #     print each[0],":", each[1]
+
 
 def localizationAnalysis(normalFile, abnormalFile, metric, manyWins, function=False):
     windows = findAnomalousWindows(normalFile, abnormalFile, metric, manyWins)
@@ -848,4 +913,3 @@ if __name__ == '__main__':
     main()
 else:
     print "Localization module loaded."
-        

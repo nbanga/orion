@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from localization import findAnomalousWindows, findAnomalousPoints, printCulpritSubWindows, localizationAnalysis
+from localization import findAnomalousWindows, findAnomalousPoints, printCulpritSubWindows, localizationAnalysis, findAnomalousFunction
 from utilityFunctions import HandleError, printMessage
 from corranalysis import metricsAnalysis
 import sys
@@ -140,6 +140,6 @@ elif mode == 'SELECT_REGIONS':
     localizationAnalysis(normalFile, abnormalFile, metric, manyWins)
 elif mode == 'SELECT_CLASSNAME':
     print "Here"
-    metric = getMetric(options)
-    #className = getClassName(options)
-    localizationAnalysis(normalFile, abnormalFile, metric, manyWins, True)
+    #metric = getMetric(options)
+    className = getClassName(options)
+    findAnomalousFunction(normalFile, abnormalFile, className)
