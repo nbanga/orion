@@ -10,13 +10,15 @@ class Node:
             self.parent = p
             print "setted parent"
 
-    def addChild(self, c):
+    def addChild(self, c, allNodes):
         #create new node
         n = Node(c)
         n.parent = self
 
         #add it to the children map
         self.children[n.value] = [n,1]
+
+        allNodes[n.value] = n
 
         #return newly added node
         return n
@@ -26,38 +28,31 @@ class Node:
             return self.children[value][0]
         return None
       
-#logic to make a list out of file entries
-#input handling
-f = open('input.txt','r')
-l = f.readlines()[0]
-l = l[1:-2].split(", ")
-
 #get name of function from list
 def getName(s):
     return s.split('-')[1]
 
-def makeGraph(l):
-    parent = Node(0)
+def makeGraph(ig, allNodes):
+    parent = Node('X')
+    allNodes['X'] = parent
     tmp = parent
-    for each in l:
+    for each in ig:
         if each.startswith("ENTER"):
-            value = each.split('-')[1]#getName(each)
-            print "checking ",value
+            value = each.split('-')[1]
             k = parent.hasChild(value)
             if k == None:
-                print "adding ", value
-                print "****"
-                k = parent.addChild(value)
+                k = parent.addChild(value,allNodes)
             else:
-                parent.children[value][1] += 1
+                if(parent.children[value][1] == 0):
+                    parent.children[value][1] += 1
             parent = k
         else:
             if parent.parent == None:
-                print "Have none type parent ", parent.value
                 continue
             parent = parent.parent
 
     parent = tmp
+    print "Ran makeGraph"
     return parent
 
 #print graph routine
@@ -66,7 +61,6 @@ def printGraph(p):
     q = [p]
     while len(q) != 0:
         it = q[0]
-        #print it, type(it)
         print "Printing children of Node "+ str(it.value)
         for each in it.children:
             print each
@@ -79,11 +73,29 @@ def printGraph(p):
             visited[each] = True
         
         q.remove(it)
-        
-def main():
-    pa = makeGraph(l)
-    printGraph(pa)
-    
-#caller
-if __name__ == "__main__":
-    main()
+
+def pruneGraph(ng, allNodes):
+    countset = set()
+    stack = ['X']
+    for each in ng :
+        if each.startswith("ENTER"):
+            fname = each.split('-')[1]
+            if allNodes.has_key(fname):
+                pfname = stack[-1]
+                if allNodes.has_key(pfname):
+                    node = allNodes[pfname]
+                    if node.hasChild(fname):
+                        countset.add((pfname, fname))
+
+            stack.append(fname)
+        else:
+            if len(each) != 0 and each.split('-')[1] == stack[-1]:
+                stack.pop()
+
+    for each in countset:
+        node = allNodes[each[0]]
+        node.children[each[1]][1] += 1
+    print "printing allNodes "
+    for each in allNodes:
+        for every in allNodes[each].children.keys():
+            print "(",each,",",every,")", " : ",allNodes[each].children[every][1] 

@@ -5,6 +5,7 @@ import math
 import operator
 import os
 import time
+from toGraph import *
 
 class Column(object):
     def __init__(self, list):
@@ -841,6 +842,19 @@ def findAnomalousFunctionWithStackTrace(normalFile, abnormalFile, className=""):
     # temp = sorted(anf.items(), key = operator.itemgetter(1), reverse=True)
     # for each in temp:
     #     print each[0],":", each[1]
+
+
+def findAnomalousFunction(windowList):
+    all_traces = []
+    allNodes = dict()
+    for win in windowList:
+        trace = win.getClassObservations()
+        all_traces.append(trace)
+
+    pa = makeGraph(all_traces[0],allNodes)
+    for each in all_traces[1:]:
+        pruneGraph(each, allNodes)
+        print "********"
 
 
 def localizationAnalysis(normalFile, abnormalFile, metric, manyWins, function=False):
