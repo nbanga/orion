@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from localization import findAnomalousWindows, findAnomalousPoints, printCulpritSubWindows, localizationAnalysis, findAnomalousFunction
+from localization import findAnomalousWindows, findAnomalousPoints, printCulpritSubWindows, localizationAnalysis, findAnomalousFunctionWithStackTrace
 from utilityFunctions import HandleError, printMessage
 from corranalysis import metricsAnalysis
 import sys
@@ -142,4 +142,4 @@ elif mode == 'SELECT_CLASSNAME':
     print "Here"
     #metric = getMetric(options)
     className = getClassName(options)
-    findAnomalousFunction(normalFile, abnormalFile, className)
+    findAnomalousFunctionWithStackTrace(normalFile, abnormalFile, className)

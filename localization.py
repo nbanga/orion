@@ -769,7 +769,7 @@ def printCulpritSubWindows(abnormalCodeRegions, abnormalWindows):
             print ""
 
 
-def findAnomalousFunction(normalFile, abnormalFile, className=""):
+def findAnomalousFunctionWithStackTrace(normalFile, abnormalFile, className=""):
     normalMatrix = DataLoader.load(normalFile)
     normalMatrix.diff()
     c1 = normalMatrix.getCol(0)
