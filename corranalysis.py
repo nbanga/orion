@@ -39,7 +39,7 @@ def calculateVectorDistance(listX, listY):
 # Returns:
 # List of k correlation vectors and most abnormal correlations
 # [[2,45,100], [100,3,9], [...], ...]
-def getAbnormalCorrelations(corrMatrixA, corrMatrixB, K, D):
+def getAbnormalCorrelations(corrMatrixA, corrMatrixB, K, D, values_only=False):
     corrVecs = []
     for i in range(corrMatrixB.rows):
         rowB = corrMatrixB.getRow(i)
@@ -52,6 +52,10 @@ def getAbnormalCorrelations(corrMatrixA, corrMatrixB, K, D):
         corrVecs.append(vecs[0])
     corrVecs.sort()
     corrVecs.reverse()
+
+    # hack to find closest normal run
+    if(values_only):
+        return corrVecs
     
     ret = []
     for i in range(K):
@@ -60,6 +64,7 @@ def getAbnormalCorrelations(corrMatrixA, corrMatrixB, K, D):
             tmp.append(corrVecs[i].dimList[j])
         ret.append(tmp)
     return ret
+
 
 def log(msg):
     print msg
@@ -137,6 +142,76 @@ def printResults(metricsRank):
 #############################################################################
 # Main script
 #############################################################################
+
+# When multiple normal runs are present, first we need to find 
+# what normal run is closest to the given abnormal run (say that's x). Then 
+# we can assume that possibly this abnormal run deviated from x. Then we 
+# perform metric analysis on the abnormal run and x
+def compareNormalRuns(normalFile, abnormalFile):
+    # Parameters
+    winSize = [100, 125, 150, 175, 200]
+    #winSize = range(200,400,20)
+    k = 5 # top-k abnormal correlations
+    d = 5 # top-d abnormal dimensions
+    
+    printMessage("comparing normal file : "+normalFile)
+    printMessage("with abnormal file    : "+abnormalFile)
+
+    normM = DataLoader.load(normalFile)
+    normM.diff()
+    normM.removeColumns([0])
+    n = normM.cols
+    
+    abnormM = DataLoader.load(abnormalFile)
+    abnormM.diff()
+    abnormM.removeColumns([0])
+    
+    # this will store the top correlations between normal and abnormal runs
+    top_corrs = [] 
+
+    
+    for w in winSize:
+        print("win size = "+str(w))
+        normalCorrMatrix = normM.getCorrelationMatrix(w)
+        abnormalCorrMatrix = abnormM.getCorrelationMatrix(w)      
+        
+        print("rows = "+str(normalCorrMatrix.rows))
+        print("cols = "+str(abnormalCorrMatrix.cols))
+
+        corrList = getAbnormalCorrelations(normalCorrMatrix, abnormalCorrMatrix, k, d, values_only=True)
+
+        # is k the optimal number here
+        for i  in range(0,k): 
+            top_corrs.append(corrList[i].diss)
+
+    return top_corrs
+
+
+
+def processFiles(normalFiles, abnormalFile):
+    nFiles = normalFiles.split(",")
+    if(len(nFiles) == 1):
+        metricsAnalysis(normalFiles,abnormalFile)
+    else:
+        printMessage("Comparing against multiple normal files")
+
+        top_corr_list = []
+
+        for f in nFiles:
+            top_corrs = compareNormalRuns(f, abnormalFile)
+            
+            for i in range(0,len(top_corrs)):
+                top_corr_list.append([f, top_corrs[i]])
+
+
+        # now sort the list w.r.t the distance
+        sorted_corr_list = sorted(top_corr_list, key=operator.itemgetter(1))
+
+        print(sorted_corr_list)
+
+        
+
+
 
 def metricsAnalysis(normalFile, abnormalFile):
     # Parameters
