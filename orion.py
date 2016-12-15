@@ -2,7 +2,7 @@
 
 from localization import findAnomalousWindows, findAnomalousPoints, printCulpritSubWindows, localizationAnalysis
 from utilityFunctions import HandleError, printMessage
-from corranalysis import metricsAnalysis
+from corranalysis import metricsAnalysis, processFiles
 import sys
 import optparse
 import time
@@ -134,7 +134,7 @@ printMessage('Normal File: ' + normalFile)
 printMessage('Abnormal File: ' + abnormalFile)
 
 if mode == 'SELECT_METRICS':
-    metricsAnalysis(normalFile, abnormalFile)
+    processFiles(normalFile, abnormalFile)
 elif mode == 'SELECT_REGIONS':
     metric = getMetric(options)
     localizationAnalysis(normalFile, abnormalFile, metric, manyWins)

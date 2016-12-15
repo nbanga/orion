@@ -47,3 +47,8 @@ Correlation analysis module loaded.
 [3]:
 	[172] org/apache/hadoop/dfs/DataNode
 
+
+# how to run orion when multiple normal runs are available
+
+$  python2 ./orion.py -n data/hadoop_case/normal_med.dat,data/hadoop_case/normal1.dat,data/hadoop_case/normal2.dat -a data/hadoop_case/abnormal_med.dat --select-metrics
+
