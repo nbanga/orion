@@ -3,7 +3,8 @@ from utilityFunctions import printMessage, HandleError
 import sys
 import math
 import operator
-    
+import matplotlib.pyplot as plt
+
 class CorrelationVector(object):
     def __init__(self, diss, dimensionsList):
         self.diss = diss
@@ -186,6 +187,24 @@ def compareNormalRuns(normalFile, abnormalFile):
 
     return top_corrs
 
+def plotCorrelations(corr_per_file):
+
+ #   plt.bar([i for i in range(0,len(corr_list))],corr_list)
+ #   plt.xlabel("Sorted index")
+ #   plt.ylabel("Vector distance")
+ #   plt.title(str(file))
+ #   plt.show()
+
+    data_points = len(corr_per_file[0])
+
+    ax = plt.subplot(111)
+    ax.bar([i-0.2 for i in range(0,data_points)], corr_per_file[0],width=0.2,color='b',align='center')
+    ax.bar([i for i in range(0,data_points)], corr_per_file[1],width=0.2,color='g',align='center')
+    ax.bar([i+0.2 for i in range(0,data_points)], corr_per_file[2],width=0.2,color='r',align='center')
+    
+
+    plt.show()
+
 
 
 def processFiles(normalFiles, abnormalFile):
@@ -196,14 +215,19 @@ def processFiles(normalFiles, abnormalFile):
         printMessage("Comparing against multiple normal files")
 
         top_corr_list = []
+        corr_per_file = []
 
         for f in nFiles:
             top_corrs = compareNormalRuns(f, abnormalFile)
+
+            # for plotting
+            corr_per_file.append(top_corrs)
             
             for i in range(0,len(top_corrs)):
                 top_corr_list.append([f, top_corrs[i]])
 
-
+        plotCorrelations(corr_per_file)
+        
         # now sort the list w.r.t the distance
         sorted_corr_list = sorted(top_corr_list, key=operator.itemgetter(1))
 
