@@ -42,6 +42,9 @@ def parseOptions():
 
     parser.add_option("-c", "--className", dest="CLASSNAME",
                       help="Classname with bug")
+
+    parser.add_option("-p", "--print-abnormal", dest="PRINT_ABNORMAL",
+                      help="Print abnormal stack trace")
     
     (options, args) = parser.parse_args()
     #if len(options) == 0:
@@ -49,6 +52,12 @@ def parseOptions():
     #    exit()
         
     return (options, args)
+
+def getPrintAbnormal(options):
+    if options.PRINT_ABNORMAL is None:
+        HandleError.exit('No print preference given.\nUse -h option for help.')
+    else:
+        return options.PRINT_ABNORMAL
 
 def getClassName(options):
     if options.CLASSNAME is None:
@@ -139,7 +148,6 @@ elif mode == 'SELECT_REGIONS':
     metric = getMetric(options)
     localizationAnalysis(normalFile, abnormalFile, metric, manyWins)
 elif mode == 'SELECT_CLASSNAME':
-    print "Here"
-    #metric = getMetric(options)
     className = getClassName(options)
-    findAnomalousFunctionWithStackTrace(normalFile, abnormalFile, className)
+    abnormal = getPrintAbnormal(options)
+    findAnomalousFunctionWithStackTrace(normalFile, abnormalFile, abnormal, className)

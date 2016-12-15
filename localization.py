@@ -769,8 +769,61 @@ def printCulpritSubWindows(abnormalCodeRegions, abnormalWindows):
                 print "\t", reg
             print ""
 
+def print_dict(l):
+    for each in l:
+        print each
+    print
 
-def findAnomalousFunctionWithStackTrace(normalFile, abnormalFile, className=""):
+def getRepetitiveChunk_old(l):
+    ret = []
+    l = l.split('\n')
+    for j in range(len(l)):
+        each = l[j]
+        flag = 0
+        for i in range(len(ret)):
+            if ret[i][0]==each:
+                ret[i][1].append(j)
+                flag = 1
+                break
+        if flag==0:
+            ret.append([each,[j]])
+
+    freq_set = dict()
+    for each in ret:
+        if freq_set.has_key(len(each[1])):
+            freq_set[len(each[1])] +=1
+        else:
+            freq_set[len(each[1])]=1
+
+    freq_list = sorted(freq_set.items(), key=operator.itemgetter(1), reverse=True)
+
+    result = []
+    for each in ret:
+        if (len(each[1])==freq_list[0]):
+            result.append(each[0])
+
+    return result
+
+def getRepetitiveChunk(l):
+    obs_set = dict()
+    ret = []
+    l = l.split('\n')
+    for each in l:
+        if obs_set.has_key(each):
+            flag = 0
+            for every in ret:
+                if every==each:
+                    flag = 1
+                    break
+            if flag==0:
+                ret.append(each)
+        else:
+            obs_set[each] = 1
+
+    result = "\n".join(each for each in ret)
+    return result
+
+def findAnomalousFunctionWithStackTrace(normalFile, abnormalFile, print_a, className=""):
     normalMatrix = DataLoader.load(normalFile)
     normalMatrix.diff()
     c1 = normalMatrix.getCol(0)
@@ -781,7 +834,7 @@ def findAnomalousFunctionWithStackTrace(normalFile, abnormalFile, className=""):
 
     nf = dict()
     anf = dict()
-    obsSet = dict()
+    obs_set = []
 
     stack = []
     stack.append("dummy")
@@ -830,19 +883,70 @@ def findAnomalousFunctionWithStackTrace(normalFile, abnormalFile, className=""):
                 stack.pop()
 
 
+    # repetitive Call stack
+    repetition_matrix = dict()
+    for abnormal in anf:
+        for each in anf[abnormal]:
+            ab_freq = anf[abnormal][each]
+            ab_trace = set(each.split('\n'))
+            for normal in nf:
+                for every in nf[normal]:
+                    #TODO: parameter tuning
+                    if abs(len(each.split('\n'))-len(every.split('\n')))<40:
+                        n_freq = nf[normal][every]
+                        n_trace = set(every.split('\n'))
+                        #TODO: parameter tuning
+                        if len(ab_trace.intersection(n_trace)) == min(len(n_trace),len(ab_trace)):
+                            if ab_freq/n_freq > 10:
+                                repetition_matrix[(each,every)] = ab_freq/n_freq
 
-    #temp = sorted(nf.items(), key = operator.itemgetter(1), reverse=True)
-    for each in anf:
-        print each
-        print "===================="
-        for every in anf[each]:
-            print every, anf[each][every]
-            print "####################"
+    l = sorted(repetition_matrix.items(), key=operator.itemgetter(1), reverse=True)
+    obs_set.append([l[0][0][0].split('\n'), l[0][0][1].split('\n')])
 
-    # temp = sorted(anf.items(), key = operator.itemgetter(1), reverse=True)
-    # for each in temp:
-    #     print each[0],":", each[1]
+    # recursive call stack
+    #TODO: check if trace actually recursive
+    recursive_matrix = dict()
+    for abnormal in anf:
+        for each in anf[abnormal]:
+            ab_freq = anf[abnormal][each]
+            ab_trace = set(each.split('\n'))
+            for normal in nf:
+                for every in nf[normal]:
+                    n_freq = nf[normal][every]
+                    n_trace = set(every.split('\n'))
+                    if len(ab_trace.intersection(n_trace)) == min(len(n_trace),len(ab_trace)):
+                        #TODO: parameter tuning
+                        if abs(len(each.split('\n'))-len(every.split('\n')))>200:
+                            recursive_matrix[(each,every)] = abs(len(each.split('\n'))-len(every.split('\n')))/len(ab_trace.intersection(n_trace))
+    l = sorted(recursive_matrix.items(), key=operator.itemgetter(1))
+    rep = []
+    rep.append([getRepetitiveChunk(l[0][0][0])])
+    rep.append(l[0][0][1].split('\n'))
+    obs_set.append(rep)
 
+    # disjoint call stack
+    disjoint_trace = []
+    for abnormal in anf:
+        for each in anf[abnormal]:
+            has_min_intersect = False
+            ab_trace = set(each.split('\n'))
+            for normal in nf:
+                for every in nf[normal]:
+                    n_trace = set(every.split('\n'))
+                    if len(ab_trace.intersection(n_trace)) == min(len(n_trace),len(ab_trace)):
+                        has_min_intersect = True
+            if not(has_min_intersect):
+                disjoint_trace.append(each.split('\n'))
+    obs_set.append(disjoint_trace)
+
+    print
+    if print_a=='1':
+        print_dict(obs_set[0][0])
+        print_dict(obs_set[1][0])
+        print_dict(obs_set[2][0])
+    else:
+        print_dict(obs_set[0][1])
+        print_dict(obs_set[1][1])
 
 def findAnomalousFunction(windowList):
     all_traces = []
