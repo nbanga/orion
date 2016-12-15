@@ -207,7 +207,31 @@ def processFiles(normalFiles, abnormalFile):
         # now sort the list w.r.t the distance
         sorted_corr_list = sorted(top_corr_list, key=operator.itemgetter(1))
 
-        print(sorted_corr_list)
+        # which nomal run dominates the first 25 distances?
+        run_map = {}
+
+        for i in range(0,25):
+
+            run = sorted_corr_list[i][0]
+
+            if run not in run_map.keys():
+                run_map[run] = 1
+            else:
+                run_map[run] = run_map[run] + 1
+
+        printMessage("Frequcny map for normal runs for closest correlation distances :"+str(run_map))
+        
+
+        closest_run = nFiles[0]
+        max_num = run_map[nFiles[0]]
+
+        for key in run_map.keys():
+            if(run_map[key] > max_num):
+                max_num = run_map[key]
+                closest_run = str(key)
+
+        printMessage("Closest normal run to given abnormal run is : "+closest_run)
+
 
         
 
