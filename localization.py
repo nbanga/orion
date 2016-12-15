@@ -821,9 +821,11 @@ def getRepetitiveChunk(l):
             obs_set[each] = 1
 
     result = "\n".join(each for each in ret)
+    print result + "==============="
     return result
 
 def findAnomalousFunctionWithStackTrace(normalFile, abnormalFile, print_a, className=""):
+    print
     normalMatrix = DataLoader.load(normalFile)
     normalMatrix.diff()
     c1 = normalMatrix.getCol(0)
@@ -901,7 +903,12 @@ def findAnomalousFunctionWithStackTrace(normalFile, abnormalFile, print_a, class
                                 repetition_matrix[(each,every)] = ab_freq/n_freq
 
     l = sorted(repetition_matrix.items(), key=operator.itemgetter(1), reverse=True)
-    obs_set.append([l[0][0][0].split('\n'), l[0][0][1].split('\n')])
+    if len(l)!=0:
+        obs_set.append([l[0][0][0].split('\n'), l[0][0][1].split('\n')])
+        if print_a=='1':
+            print_dict(obs_set[0][0])
+        else:
+            print_dict(obs_set[0][1])
 
     # recursive call stack
     #TODO: check if trace actually recursive
@@ -919,10 +926,15 @@ def findAnomalousFunctionWithStackTrace(normalFile, abnormalFile, print_a, class
                         if abs(len(each.split('\n'))-len(every.split('\n')))>200:
                             recursive_matrix[(each,every)] = abs(len(each.split('\n'))-len(every.split('\n')))/len(ab_trace.intersection(n_trace))
     l = sorted(recursive_matrix.items(), key=operator.itemgetter(1))
-    rep = []
-    rep.append([getRepetitiveChunk(l[0][0][0])])
-    rep.append(l[0][0][1].split('\n'))
-    obs_set.append(rep)
+    if  len(l)!=0:
+        rep = []
+        rep.append([getRepetitiveChunk(l[0][0][0])])
+        rep.append(l[0][0][1].split('\n'))
+        obs_set.append(rep)
+        if print_a=='1':
+            print_dict(obs_set[1][0])
+        else:
+            print_dict(obs_set[1][1])
 
     # disjoint call stack
     disjoint_trace = []
@@ -937,16 +949,10 @@ def findAnomalousFunctionWithStackTrace(normalFile, abnormalFile, print_a, class
                         has_min_intersect = True
             if not(has_min_intersect):
                 disjoint_trace.append(each.split('\n'))
-    obs_set.append(disjoint_trace)
-
-    print
-    if print_a=='1':
-        print_dict(obs_set[0][0])
-        print_dict(obs_set[1][0])
-        print_dict(obs_set[2][0])
-    else:
-        print_dict(obs_set[0][1])
-        print_dict(obs_set[1][1])
+    if len(disjoint_trace)!=0:
+        obs_set.append(disjoint_trace)
+        if print_a=='1':
+            print_dict(obs_set[2][0])
 
 def findAnomalousFunction(windowList):
     all_traces = []

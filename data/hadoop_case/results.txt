@@ -1,3 +1,7 @@
+# how to run orion when multiple normal runs are available
+
+$ python2 ./orion.py -n data/hadoop_case/normal_med.dat,data/hadoop_case/normal1.dat,data/hadoop_case/normal2.dat -a data/hadoop_case/abnormal_med.dat --select-metrics
+
 $ ./orion.py -n data/hadoop_case/normal_med.dat -a data/hadoop_case/abnormal_med.dat --select-metrics
 Localization module loaded.
 Correlation analysis module loaded.
@@ -31,7 +35,6 @@ Format: [Rank] [Metric]
 [10]: utime
 
 
-
 $ ./orion.py -n data/hadoop_case/normal_med.dat -a data/hadoop_case/abnormal_med.dat --select-regions -m num_file_desc
 Localization module loaded.
 Correlation analysis module loaded.
@@ -48,7 +51,91 @@ Correlation analysis module loaded.
 	[172] org/apache/hadoop/dfs/DataNode
 
 
-# how to run orion when multiple normal runs are available
+$ ./orion.py -n data/hadoop_case/normal_med.dat -a data/hadoop_case/abnormal_med.dat --select-classname -c DFSClient -p 0
 
-$  python2 ./orion.py -n data/hadoop_case/normal_med.dat,data/hadoop_case/normal1.dat,data/hadoop_case/normal2.dat -a data/hadoop_case/abnormal_med.dat --select-metrics
+Localization module loaded.
+Correlation analysis module loaded.
+[ORION]: Normal File: data/hadoop_case/normal_med.dat
+[ORION]: Abnormal File: data/hadoop_case/abnormal_med.dat
 
+dummy
+org/apache/hadoop/dfs/DFSClient$LeaseChecker$run
+org/apache/hadoop/dfs/DFSClient$datanodeReport
+org/apache/hadoop/dfs/DFSClient$LeaseChecker$run
+org/apache/hadoop/dfs/DFSClient$datanodeReport
+org/apache/hadoop/dfs/DFSClient$LeaseChecker$run
+org/apache/hadoop/dfs/DFSClient$DFSOutputStream$writeChunk
+org/apache/hadoop/dfs/DFSClient$DFSOutputStream$DataStreamer$run
+org/apache/hadoop/dfs/DFSClient$access$500
+org/apache/hadoop/dfs/DFSClient$checkOpen
+org/apache/hadoop/dfs/DFSClient$DFSOutputStream$isClosed
+org/apache/hadoop/dfs/DFSClient$DFSOutputStream$close
+org/apache/hadoop/dfs/DFSClient$DFSOutputStream$closeInternal
+org/apache/hadoop/dfs/DFSClient$DFSOutputStream$flushInternal
+org/apache/hadoop/dfs/DFSClient$DFSOutputStream$access$1700
+org/apache/hadoop/dfs/DFSClient$DFSOutputStream$ResponseProcessor$run
+org/apache/hadoop/dfs/DFSClient$DFSOutputStream$access$1000
+org/apache/hadoop/dfs/DFSClient$DFSOutputStream$access$1200
+org/apache/hadoop/dfs/DFSClient$DFSOutputStream$access$1000
+org/apache/hadoop/dfs/DFSClient$DFSOutputStream$access$1000
+org/apache/hadoop/dfs/DFSClient$DFSOutputStream$access$1600
+org/apache/hadoop/dfs/DFSClient$DFSOutputStream$closeThreads
+org/apache/hadoop/dfs/DFSClient$DFSOutputStream$DataStreamer$close
+org/apache/hadoop/dfs/DFSClient$DFSOutputStream$access$1000
+org/apache/hadoop/dfs/DFSClient$DFSOutputStream$access$1000
+org/apache/hadoop/dfs/DFSClient$DFSOutputStream$DataStreamer$run
+org/apache/hadoop/dfs/DFSClient$DFSOutputStream$writeChunk
+org/apache/hadoop/dfs/DFSClient$DFSOutputStream$access$1000
+org/apache/hadoop/dfs/DFSClient$access$500
+org/apache/hadoop/dfs/DFSClient$checkOpen
+org/apache/hadoop/dfs/DFSClient$DFSOutputStream$access$1100
+org/apache/hadoop/dfs/DFSClient$DFSOutputStream$close
+org/apache/hadoop/dfs/DFSClient$DFSOutputStream$closeInternal
+org/apache/hadoop/dfs/DFSClient$DFSOutputStream$flushInternal
+org/apache/hadoop/dfs/DFSClient$DFSOutputStream$access$1700
+org/apache/hadoop/dfs/DFSClient$DFSOutputStream$ResponseProcessor$run
+org/apache/hadoop/dfs/DFSClient$DFSOutputStream$access$1600
+org/apache/hadoop/dfs/DFSClient$DFSOutputStream$access$1900
+org/apache/hadoop/dfs/DFSClient$DFSOutputStream$access$800
+org/apache/hadoop/dfs/DFSClient$DFSOutputStream$access$1600
+org/apache/hadoop/dfs/DFSClient$DFSOutputStream$closeThreads
+org/apache/hadoop/dfs/DFSClient$DFSOutputStream$DataStreamer$close
+org/apache/hadoop/dfs/DFSClient$DFSOutputStream$access$1800
+org/apache/hadoop/dfs/DFSClient$DFSOutputStream$access$1800
+org/apache/hadoop/dfs/DFSClient$DFSOutputStream$access$1000
+org/apache/hadoop/dfs/DFSClient$DFSOutputStream$DataStreamer$run
+org/apache/hadoop/dfs/DFSClient$DFSOutputStream$writeChunk
+org/apache/hadoop/dfs/DFSClient$access$500
+org/apache/hadoop/dfs/DFSClient$DFSOutputStream$writeChunk
+org/apache/hadoop/dfs/DFSClient$DFSOutputStream$isClosed
+
+org/apache/hadoop/dfs/DFSClient$LeaseChecker$run
+org/apache/hadoop/dfs/DFSClient$datanodeReport
+org/apache/hadoop/dfs/DFSClient$DFSOutputStream$access$1000
+org/apache/hadoop/dfs/DFSClient$DFSOutputStream$DataStreamer$run
+org/apache/hadoop/dfs/DFSClient$DFSOutputStream$writeChunk
+org/apache/hadoop/dfs/DFSClient$access$500
+org/apache/hadoop/dfs/DFSClient$checkOpen
+org/apache/hadoop/dfs/DFSClient$DFSOutputStream$close
+org/apache/hadoop/dfs/DFSClient$DFSOutputStream$closeInternal
+org/apache/hadoop/dfs/DFSClient$DFSOutputStream$flushInternal
+org/apache/hadoop/dfs/DFSClient$DFSOutputStream$access$1700
+org/apache/hadoop/dfs/DFSClient$DFSOutputStream$ResponseProcessor$run
+org/apache/hadoop/dfs/DFSClient$DFSOutputStream$access$1600
+org/apache/hadoop/dfs/DFSClient$DFSOutputStream$closeThreads
+org/apache/hadoop/dfs/DFSClient$DFSOutputStream$DataStreamer$close
+org/apache/hadoop/dfs/DFSClient$DFSOutputStream$access$1800
+org/apache/hadoop/dfs/DFSClient$DFSOutputStream$isClosed
+org/apache/hadoop/dfs/DFSClient$DFSOutputStream$access$1100
+org/apache/hadoop/dfs/DFSClient$DFSOutputStream$access$1900
+org/apache/hadoop/dfs/DFSClient$DFSOutputStream$access$800
+org/apache/hadoop/dfs/DFSClient$DFSOutputStream$access$900
+org/apache/hadoop/dfs/DFSClient$DFSOutputStream$ResponseProcessor$close
+org/apache/hadoop/dfs/DFSClient$DFSOutputStream$access$1400
+org/apache/hadoop/dfs/DFSClient$create
+org/apache/hadoop/dfs/DFSClient$DFSOutputStream$processDatanodeError
+org/apache/hadoop/dfs/DFSClient$DFSOutputStream$access$1200
+org/apache/hadoop/dfs/DFSClient$DFSOutputStream$access$902
+
+dummy
+org/apache/hadoop/dfs/DFSClient$createRPCNamenode
