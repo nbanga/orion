@@ -821,7 +821,6 @@ def getRepetitiveChunk(l):
             obs_set[each] = 1
 
     result = "\n".join(each for each in ret)
-    print result + "==============="
     return result
 
 def findAnomalousFunctionWithStackTrace(normalFile, abnormalFile, print_a, className=""):
